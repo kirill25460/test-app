@@ -20,7 +20,7 @@ const generateCards = (): CardType[] => {
   return cards.sort(() => Math.random() - 0.5);
 };
 
-const MemoryGame = () => {
+const GameDogs = () => {
   const [cards, setCards] = useState<CardType[]>([]);
   const [isCardsRevealed, setIsCardsRevealed] = useState(true);
   const [selectedPairId, setSelectedPairId] = useState<number | null>(null);
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MemoryGame;
+export default GameDogs;

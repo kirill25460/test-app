@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text,ImageBackground,SafeAreaView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 
 type CardType = {
   id: number;
@@ -17,10 +17,10 @@ const generateCards = (): CardType[] => {
     cards.push({ id: i * 2 + 1, pairId: i, isOpen: true, isMatched: false });
   }
   // Перемішуємо
-  return cards.sort(() => Math.random() - 0.5);
+  return cards;
 };
 
-const MemoryGame = () => {
+const GameZeus = () => {
   const [cards, setCards] = useState<CardType[]>([]);
   const [isCardsRevealed, setIsCardsRevealed] = useState(true);
   const [selectedPairId, setSelectedPairId] = useState<number | null>(null);
@@ -61,7 +61,12 @@ const MemoryGame = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+          <ImageBackground
+        source={require('../assets/images/zeusBg.png')}
+        resizeMode="cover"
+        style={styles.image}
+      >
       <View style={styles.grid}>
         {cards.map((card) => (
           <TouchableOpacity
@@ -74,7 +79,8 @@ const MemoryGame = () => {
           </TouchableOpacity>
         ))}
       </View>
-    </View>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
@@ -84,9 +90,9 @@ const cardSize = (width - 40) / 4;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+  },
+  image: {
+    flex: 1,
   },
   title: {
     fontSize: 20,
@@ -119,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MemoryGame;
+export default GameZeus;
