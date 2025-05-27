@@ -1,7 +1,6 @@
 import React from 'react';
-import { Text, Image, ImageBackground, StyleSheet, View } from 'react-native';
+import { TouchableOpacity, Image, ImageBackground, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import GradientButton from '@/components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 
 const Start = () => {
@@ -19,9 +18,13 @@ const Start = () => {
             style={styles.logo}
             resizeMode="contain"
           />
-          <GradientButton style={styles.button} onPress={() => navigation.navigate('LevelsMenu')}>
-            <Text style={styles.buttonText}>START</Text>
-          </GradientButton>
+          <TouchableOpacity onPress={() => navigation.navigate('LevelsMenu')} activeOpacity={0.8}>
+      <Image
+        source={require('../../assets/images/btnStart.png')}
+        style={styles.buttonImage}
+        resizeMode="contain"
+      />
+    </TouchableOpacity>
         </View>
       </ImageBackground>
     </SafeAreaView>
@@ -44,14 +47,9 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
   },
-  button: {
+  buttonImage: {
     width: 160,
     height: 40,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: '400',
   },
 });
 

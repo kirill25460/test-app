@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import GradientButton from './GradientButton';
+import BackButton from './BackButton';
 
 type GameResultModalProps = {
     visible: boolean;
@@ -34,17 +34,21 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ visible, onBack, onNe
           
           </LinearGradient>
           <View style={styles.buttons}>
-              <GradientButton onPress={onHome}>
-                <Image source={require('../assets/images/homeIcon.png')} style={styles.icon} />
-              </GradientButton>
+          <TouchableOpacity onPress={onNext} activeOpacity={0.8}>
+            <Image
+              source={require('../assets/images/home.png')}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
               {isWin ? (
-    <GradientButton onPress={onNext}>
-      <Image source={require('../assets/images/nextIcon.png')} style={styles.icon} />
-    </GradientButton>
+            <TouchableOpacity onPress={onNext} activeOpacity={0.8}>
+            <Image
+              source={require('../assets/images/next.png')}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
   ) : (
-    <GradientButton onPress={onNext}>
-      <Image source={require('../assets/images/back.png')} style={styles.icon} />
-    </GradientButton>
+             <BackButton onPress={onNext}/>
   )}
             </View>
         </View>

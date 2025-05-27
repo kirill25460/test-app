@@ -1,29 +1,36 @@
-// App.tsx (в корне проекта)
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { WebView } from 'react-native-webview';
-import { Slot } from 'expo-router';
 
-export default function App() {
+export default function GeoLocation({ children }: { children: React.ReactNode }) {
   const [isUkraine, setIsUkraine] = useState<boolean | null>(null);
 
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
+        console.log('⛔ Дозвіл на геолокацію не надано');
         setIsUkraine(false);
         return;
       }
 
       const location = await Location.getCurrentPositionAsync({});
+      console.log('📍 Координати:', location.coords);
+
       const reverseGeocode = await Location.reverseGeocodeAsync({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
 
-      const countryCode = reverseGeocode[0]?.isoCountryCode;
-      setIsUkraine(countryCode === 'UA');
+      if (reverseGeocode.length > 0) {
+        const place = reverseGeocode[0];
+        console.log('📌 Геолокація:', place);
+        console.log(`🌍 Країна: ${place.country}, Код: ${place.isoCountryCode}`);
+        setIsUkraine(place.isoCountryCode === 'UA');
+      } else {
+        setIsUkraine(false);
+      }
     })();
   }, []);
 
@@ -39,8 +46,7 @@ export default function App() {
     return <WebView source={{ uri: 'https://uk.wikipedia.org/wiki/Ukraine' }} style={{ flex: 1 }} />;
   }
 
-  // Здесь подключается весь expo-router
-  return <Slot />;
+  return <>{children}</>;
 }
 
 const styles = StyleSheet.create({

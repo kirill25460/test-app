@@ -1,7 +1,6 @@
 import React from 'react';
-import {  Image, ImageBackground, StyleSheet, View } from 'react-native';
-
-import GradientButton from '@/components/GradientButton';
+import {  TouchableOpacity,Image, ImageBackground, StyleSheet, View } from 'react-native';
+import BackButton from './BackButton'; 
 import { useNavigation } from '@react-navigation/native';
 
 const Header = ({ type }: { type: 'home' | 'Rules' | 'game' }) => {
@@ -14,27 +13,26 @@ const Header = ({ type }: { type: 'home' | 'Rules' | 'game' }) => {
       resizeMode="cover"
     >
         {type === 'home' && (
-          <>
+          <View style={styles.centerElements}>
             <Image source={require('../assets/images/headerLogo.png')} style={styles.logo} />
-            <GradientButton onPress={() => navigation.navigate('Rules')}>
-              <Image source={require('../assets/images/info.png')} style={styles.icon} />
-            </GradientButton>
-          </>
-        )}
+            <TouchableOpacity onPress={() => navigation.navigate('Rules')} activeOpacity={0.8}>
+      <Image
+        source={require('../assets/images/info.png')}
+        resizeMode="contain"
+      />
+    </TouchableOpacity>
+            </View>            )}
         {type === 'Rules' && (
-          <>
-            <GradientButton onPress={() => navigation.goBack()} style={styles.button}>
-              <Image source={require('../assets/images/back.png')} style={styles.icon} />
-            </GradientButton>
+          <View style={styles.centerElements}>
+          <BackButton onPress={() => navigation.navigate('LevelsMenu')}/>
             <Image source={require('../assets/images/headerLogo.png')} style={styles.logo} />
             <View /> 
-          </>
+            </View>
+         
         )}
         {type === 'game' && (
           <><View style={styles.centerElements}>
-            <GradientButton onPress={() => navigation.navigate('LevelsMenu')} style={styles.button}>
-              <Image source={require('../assets/images/back.png')} style={styles.icon} />
-            </GradientButton>
+              <BackButton onPress={() => navigation.navigate('LevelsMenu')}/>
               <Image source={require('../assets/images/Heart.png')} style={styles.heartIcon} />
               <Image source={require('../assets/images/score.png')} style={styles.scoreIcon} />
             </View>
@@ -85,6 +83,7 @@ const styles = StyleSheet.create({
     justifyContent:'space-around',
     paddingBottom:15,
   },
+  
 });
 
 export default Header;

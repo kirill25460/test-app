@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image,ImageBackground,SafeAreaView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import GameResultModal from '@/components/GameResultModal';
+import { useLevelProgress } from '@/hooks/useLevelProgress';
+import { useNavigation } from '@react-navigation/native';
 
 type Card = {
   id: number;
@@ -17,54 +20,76 @@ const images = [
    require('../assets/images/cardSpace3.png'),
 ];
 
+
 const shuffleArray = (array: any[]) => {
   return array
-    .map((value) => ({ value, sort: Math.random() }))
+    .map((item) => ({ item, sort: Math.random() }))
     .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
+    .map(({ item }) => item);
 };
 
-
 const GameSpace = () => {
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<any[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
-  const [disabled, setDisabled] = useState(true);
-  const [tries, setTries] = useState(0);
+  const [disabled, setDisabled] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isWin, setIsWin] = useState(false);
+
+  const navigation = useNavigation();
+
+
 
   useEffect(() => {
-    const shuffled = shuffleArray(images);
-    const initialized = shuffled.map((img, idx) => ({
-      id: idx,
-      image: img,
+    startGame();
+  }, []);
+
+  const startGame = () => {
+    const shuffledImages = shuffleArray(images);
+    const initializedCards = shuffledImages.map((image, index) => ({
+      id: index,
+      image,
       isFlipped: true,
       isMatched: false,
     }));
-    setCards(initialized);
+    setCards(initializedCards);
 
-    // Показываем карточки 2 секунды, потом скрываем
     setTimeout(() => {
-      const hidden = initialized.map((card) => ({ ...card, isFlipped: false }));
-      setCards(hidden);
+      const hiddenCards = initializedCards.map((card) => ({
+        ...card,
+        isFlipped: false,
+      }));
+      setCards(hiddenCards);
       setDisabled(false);
     }, 2000);
-  }, []);
+  };
+
+  useEffect(() => {
+    if (
+      cards.length > 0 &&
+      cards.every((card) => card.isMatched) &&
+      selected.length === 0
+    ) {
+      setTimeout(() => {
+        setIsModalVisible(true);
+        setIsWin(true);
+      }, 500);
+    }
+  }, [cards, selected]);
 
   const handlePress = (index: number) => {
-    if (disabled || cards[index].isFlipped || cards[index].isMatched) return;
+    if (disabled || selected.includes(index) || cards[index].isMatched) return;
 
+    const newSelected = [...selected, index];
     const newCards = [...cards];
     newCards[index].isFlipped = true;
-    const newSelected = [...selected, index];
     setCards(newCards);
     setSelected(newSelected);
 
     if (newSelected.length === 2) {
       setDisabled(true);
-      setTries((prev) => prev + 1);
       const [first, second] = newSelected;
 
       if (newCards[first].image === newCards[second].image) {
-        // Совпало
         newCards[first].isMatched = true;
         newCards[second].isMatched = true;
         setTimeout(() => {
@@ -73,19 +98,21 @@ const GameSpace = () => {
           setDisabled(false);
         }, 500);
       } else {
-        // Не совпало
         setTimeout(() => {
           newCards[first].isFlipped = false;
           newCards[second].isFlipped = false;
           setCards([...newCards]);
           setSelected([]);
           setDisabled(false);
+          setIsWin(false);
+          setIsModalVisible(true);
         }, 1000);
       }
     }
   };
 
-  const isWin = cards.every((card) => card.isMatched);
+  const { handleLevelEnd } = useLevelProgress(startGame);
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -110,6 +137,26 @@ const GameSpace = () => {
         ))}
       </View>
       </ImageBackground>
+      <GameResultModal
+  visible={isModalVisible}
+  isWin={isWin}
+  onBack={() => {
+    setIsModalVisible(false);
+  }}
+  onNext={() => {
+    setIsModalVisible(false);
+    handleLevelEnd(isWin); 
+  }}
+  onHome={() => {
+    setIsModalVisible(false);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: '(tabs)' }], 
+    });
+  }}
+  
+/>
+
     </SafeAreaView>
   );
 }
@@ -143,8 +190,6 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
   },
-
-  
 });
 
 export default GameSpace;

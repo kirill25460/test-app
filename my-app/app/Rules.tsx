@@ -29,11 +29,30 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'space-evenly', 
     alignItems: 'center',
   },
-text:{},
-loremText:{},
+text:{
+fontFamily: 'Baloo 2',
+fontWeight: 600,
+fontSize: 22,
+lineHeight: 35,
+marginTop:40,
+marginBottom:30,
+textAlign: 'center',
+letterSpacing: 1,
+textTransform: 'uppercase',
+color: '#FFFFFF',
+
+},
+loremText:{
+fontFamily: 'Baloo 2',
+textAlign: 'left',
+width:343,
+fontWeight: 400,
+fontSize: 18,
+lineHeight: 29,
+color: '#FFFFFF',
+},
 });
 
 export default Rules;

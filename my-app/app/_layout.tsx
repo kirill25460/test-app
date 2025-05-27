@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import Header from '../components/Header'; 
+import GeoLocation from '../components/GeoLocation';
 import { useColorScheme } from '@/hooks/useColorScheme';
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -15,6 +16,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <GeoLocation>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="LevelsMenu" options={{ header: () => <Header type="home" /> }} />
@@ -28,6 +30,7 @@ export default function RootLayout() {
         <Stack.Screen name="GameCandy" options={{ header: () => <Header type="game" /> }} />
         <Stack.Screen name="GameDogs" options={{ header: () => <Header type="game" /> }} />
       </Stack>
+      </GeoLocation>
       <StatusBar style="auto" />
     </ThemeProvider>
   );

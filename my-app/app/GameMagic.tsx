@@ -1,122 +1,196 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Image,ImageBackground,SafeAreaView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import GameResultModal from '@/components/GameResultModal';
+import { useLevelProgress } from '@/hooks/useLevelProgress';
+import { useNavigation } from '@react-navigation/native';
 
-type CardType = {
+type Card = {
   id: number;
-  pairId: number;
-  isOpen: boolean;
+  image: any;
+  isFlipped: boolean;
   isMatched: boolean;
 };
 
-const CARD_PAIRS = 6; // 12 карток (6 пар)
+const images = [
+  require('../assets/images/magicCard.png'),
+ require('../assets/images/magicCard2.png'),
+ require('../assets/images/magicCard3.png'),
+ require('../assets/images/magicCard.png'),
+ require('../assets/images/magicCard2.png'),
+ require('../assets/images/magicCard3.png'),
+];
 
-const generateCards = (): CardType[] => {
-  const cards: CardType[] = [];
-  for (let i = 0; i < CARD_PAIRS; i++) {
-    cards.push({ id: i * 2, pairId: i, isOpen: true, isMatched: false });
-    cards.push({ id: i * 2 + 1, pairId: i, isOpen: true, isMatched: false });
-  }
-  // Перемішуємо
-  return cards.sort(() => Math.random() - 0.5);
+const shuffleArray = (array: any[]) => {
+  return array
+    .map((item) => ({ item, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ item }) => item);
 };
 
 const GameMagic = () => {
-  const [cards, setCards] = useState<CardType[]>([]);
-  const [isCardsRevealed, setIsCardsRevealed] = useState(true);
-  const [selectedPairId, setSelectedPairId] = useState<number | null>(null);
-  const [progressIndex, setProgressIndex] = useState(0); // для порядку вибору пар
+  const [cards, setCards] = useState<any[]>([]);
+  const [selected, setSelected] = useState<number[]>([]);
+  const [disabled, setDisabled] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isWin, setIsWin] = useState(false);
+
+  const navigation = useNavigation();
+
+
 
   useEffect(() => {
-    const newCards = generateCards();
-    setCards(newCards);
-
-    // Показати всі відкритими 1.5 секунди, потім закрити
-    setTimeout(() => {
-      setCards((prev) =>
-        prev.map((card) => ({
-          ...card,
-          isOpen: false,
-        }))
-      );
-      setIsCardsRevealed(false);
-    }, 2000);
+    startGame();
   }, []);
 
-  const onCardPress = (card: CardType) => {
-    if (isCardsRevealed || card.isOpen || card.isMatched) return;
+  const startGame = () => {
+    const shuffledImages = shuffleArray(images);
+    const initializedCards = shuffledImages.map((image, index) => ({
+      id: index,
+      image,
+      isFlipped: true,
+      isMatched: false,
+    }));
+    setCards(initializedCards);
 
-    // Перевіряємо чи це наступна пара в порядку
-    if (card.pairId === progressIndex) {
-      // Відкриваємо картку
-      setCards((prev) =>
-        prev.map((c) =>
-          c.id === card.id ? { ...c, isOpen: true, isMatched: true } : c
-        )
-      );
-      setProgressIndex(progressIndex + 1);
-      if (progressIndex + 1 === CARD_PAIRS) {
-        alert('Вітаємо! Рівень пройдений!');
+    setTimeout(() => {
+      const hiddenCards = initializedCards.map((card) => ({
+        ...card,
+        isFlipped: false,
+      }));
+      setCards(hiddenCards);
+      setDisabled(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    if (
+      cards.length > 0 &&
+      cards.every((card) => card.isMatched) &&
+      selected.length === 0
+    ) {
+      setTimeout(() => {
+        setIsModalVisible(true);
+        setIsWin(true);
+      }, 500);
+    }
+  }, [cards, selected]);
+
+  const handlePress = (index: number) => {
+    if (disabled || selected.includes(index) || cards[index].isMatched) return;
+
+    const newSelected = [...selected, index];
+    const newCards = [...cards];
+    newCards[index].isFlipped = true;
+    setCards(newCards);
+    setSelected(newSelected);
+
+    if (newSelected.length === 2) {
+      setDisabled(true);
+      const [first, second] = newSelected;
+
+      if (newCards[first].image === newCards[second].image) {
+        newCards[first].isMatched = true;
+        newCards[second].isMatched = true;
+        setTimeout(() => {
+          setCards([...newCards]);
+          setSelected([]);
+          setDisabled(false);
+        }, 500);
+      } else {
+        setTimeout(() => {
+          newCards[first].isFlipped = false;
+          newCards[second].isFlipped = false;
+          setCards([...newCards]);
+          setSelected([]);
+          setDisabled(false);
+          setIsWin(false);
+          setIsModalVisible(true);
+        }, 1000);
       }
     }
   };
 
+  const { handleLevelEnd } = useLevelProgress(startGame);
+
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ImageBackground
+        source={require('../assets/images/zeusBg.png')}
+        resizeMode="cover"
+        style={styles.imageBg}
+      >
       <View style={styles.grid}>
-        {cards.map((card) => (
+        {cards.map((card, index) => (
           <TouchableOpacity
-            key={card.id}
-            style={[styles.card, card.isOpen ? styles.cardOpen : styles.cardClosed]}
-            onPress={() => onCardPress(card)}
-            activeOpacity={0.8}
+            key={index}
+            style={styles.card}
+            onPress={() => handlePress(index)}
           >
-            <Text style={styles.cardText}>{card.isOpen ? card.pairId + 1 : '?'}</Text>
+            {card.isFlipped || card.isMatched ? (
+              <Image source={card.image} style={styles.image} />
+            ) : (
+              <Image source={require('../assets/images/cardBack.png')} style={styles.image} />
+            )}
           </TouchableOpacity>
         ))}
       </View>
-    </View>
-  );
-};
+      </ImageBackground>
+      <GameResultModal
+  visible={isModalVisible}
+  isWin={isWin}
+  onBack={() => {
+    setIsModalVisible(false);
+  }}
+  onNext={() => {
+    setIsModalVisible(false);
+    handleLevelEnd(isWin); 
+  }}
+  onHome={() => {
+    setIsModalVisible(false);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: '(tabs)' }], 
+    });
+  }}
+  
+/>
 
-const { width } = Dimensions.get('window');
-const cardSize = (width - 40) / 4;
+    </SafeAreaView>
+  );
+}
+
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+
   },
-  title: {
-    fontSize: 20,
-    marginBottom: 20,
+  imageBg: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  image: {
+    width: 150,
+    height: 150,
+    resizeMode: 'cover',
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    width: cardSize * 4,
+    padding: 20,
     justifyContent: 'center',
+    gap: 15, 
   },
   card: {
-    width: cardSize - 10,
-    height: cardSize - 10,
-    margin: 5,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 150,
+    height: 150,
   },
-  cardOpen: {
-    backgroundColor: '#4caf50',
-  },
-  cardClosed: {
-    backgroundColor: '#9e9e9e',
-  },
-  cardText: {
-    fontSize: 24,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+
+  
 });
 
 export default GameMagic;
