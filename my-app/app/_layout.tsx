@@ -3,12 +3,12 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-import Header from '../components/Header'; // 👈 импортируем кастомный Header
+import Header from '../components/Header'; 
 import { useColorScheme } from '@/hooks/useColorScheme';
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require('../assets/fonts/Baloo2-VariableFont_wght.ttf'),
   });
 
   if (!loaded) return null;

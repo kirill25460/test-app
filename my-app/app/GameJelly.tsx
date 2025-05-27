@@ -1,122 +1,150 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Image,ImageBackground,SafeAreaView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 
-type CardType = {
+type Card = {
   id: number;
-  pairId: number;
-  isOpen: boolean;
+  image: any;
+  isFlipped: boolean;
   isMatched: boolean;
 };
 
-const CARD_PAIRS = 6; // 12 карток (6 пар)
+const images = [
+  require('../assets/images/cardJelly.png'),
+ require('../assets/images/cardJelly2.png'),
+  require('../assets/images/cardJelly3.png'),
+  require('../assets/images/cardJelly.png'),
+ require('../assets/images/cardJelly2.png'),
+  require('../assets/images/cardJelly3.png'),
+];
 
-const generateCards = (): CardType[] => {
-  const cards: CardType[] = [];
-  for (let i = 0; i < CARD_PAIRS; i++) {
-    cards.push({ id: i * 2, pairId: i, isOpen: true, isMatched: false });
-    cards.push({ id: i * 2 + 1, pairId: i, isOpen: true, isMatched: false });
-  }
-  // Перемішуємо
-  return cards.sort(() => Math.random() - 0.5);
+const shuffleArray = (array: any[]) => {
+  return array
+    .map((value) => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value);
 };
 
+
 const GameJelly = () => {
-  const [cards, setCards] = useState<CardType[]>([]);
-  const [isCardsRevealed, setIsCardsRevealed] = useState(true);
-  const [selectedPairId, setSelectedPairId] = useState<number | null>(null);
-  const [progressIndex, setProgressIndex] = useState(0); // для порядку вибору пар
+  const [cards, setCards] = useState<Card[]>([]);
+  const [selected, setSelected] = useState<number[]>([]);
+  const [disabled, setDisabled] = useState(true);
+  const [tries, setTries] = useState(0);
 
   useEffect(() => {
-    const newCards = generateCards();
-    setCards(newCards);
+    const shuffled = shuffleArray(images);
+    const initialized = shuffled.map((img, idx) => ({
+      id: idx,
+      image: img,
+      isFlipped: true,
+      isMatched: false,
+    }));
+    setCards(initialized);
 
-    // Показати всі відкритими 1.5 секунди, потім закрити
+    // Показываем карточки 2 секунды, потом скрываем
     setTimeout(() => {
-      setCards((prev) =>
-        prev.map((card) => ({
-          ...card,
-          isOpen: false,
-        }))
-      );
-      setIsCardsRevealed(false);
+      const hidden = initialized.map((card) => ({ ...card, isFlipped: false }));
+      setCards(hidden);
+      setDisabled(false);
     }, 2000);
   }, []);
 
-  const onCardPress = (card: CardType) => {
-    if (isCardsRevealed || card.isOpen || card.isMatched) return;
+  const handlePress = (index: number) => {
+    if (disabled || cards[index].isFlipped || cards[index].isMatched) return;
 
-    // Перевіряємо чи це наступна пара в порядку
-    if (card.pairId === progressIndex) {
-      // Відкриваємо картку
-      setCards((prev) =>
-        prev.map((c) =>
-          c.id === card.id ? { ...c, isOpen: true, isMatched: true } : c
-        )
-      );
-      setProgressIndex(progressIndex + 1);
-      if (progressIndex + 1 === CARD_PAIRS) {
-        alert('Вітаємо! Рівень пройдений!');
+    const newCards = [...cards];
+    newCards[index].isFlipped = true;
+    const newSelected = [...selected, index];
+    setCards(newCards);
+    setSelected(newSelected);
+
+    if (newSelected.length === 2) {
+      setDisabled(true);
+      setTries((prev) => prev + 1);
+      const [first, second] = newSelected;
+
+      if (newCards[first].image === newCards[second].image) {
+        // Совпало
+        newCards[first].isMatched = true;
+        newCards[second].isMatched = true;
+        setTimeout(() => {
+          setCards([...newCards]);
+          setSelected([]);
+          setDisabled(false);
+        }, 500);
+      } else {
+        // Не совпало
+        setTimeout(() => {
+          newCards[first].isFlipped = false;
+          newCards[second].isFlipped = false;
+          setCards([...newCards]);
+          setSelected([]);
+          setDisabled(false);
+        }, 1000);
       }
     }
   };
 
+  const isWin = cards.every((card) => card.isMatched);
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ImageBackground
+        source={require('../assets/images/jellyBg.png')}
+        resizeMode="cover"
+        style={styles.imageBg}
+      >
       <View style={styles.grid}>
-        {cards.map((card) => (
+        {cards.map((card, index) => (
           <TouchableOpacity
-            key={card.id}
-            style={[styles.card, card.isOpen ? styles.cardOpen : styles.cardClosed]}
-            onPress={() => onCardPress(card)}
-            activeOpacity={0.8}
+            key={index}
+            style={styles.card}
+            onPress={() => handlePress(index)}
           >
-            <Text style={styles.cardText}>{card.isOpen ? card.pairId + 1 : '?'}</Text>
+            {card.isFlipped || card.isMatched ? (
+              <Image source={card.image} style={styles.image} />
+            ) : (
+              <Image source={require('../assets/images/cardBack.png')} style={styles.image} />
+            )}
           </TouchableOpacity>
         ))}
       </View>
-    </View>
+      </ImageBackground>
+    </SafeAreaView>
   );
-};
+}
 
-const { width } = Dimensions.get('window');
-const cardSize = (width - 40) / 4;
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+
   },
-  title: {
-    fontSize: 20,
-    marginBottom: 20,
+  imageBg: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  image: {
+    width: 150,
+    height: 150,
+    resizeMode: 'cover',
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    width: cardSize * 4,
+    padding: 20,
     justifyContent: 'center',
+    gap: 15, 
   },
   card: {
-    width: cardSize - 10,
-    height: cardSize - 10,
-    margin: 5,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 150,
+    height: 150,
   },
-  cardOpen: {
-    backgroundColor: '#4caf50',
-  },
-  cardClosed: {
-    backgroundColor: '#9e9e9e',
-  },
-  cardText: {
-    fontSize: 24,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+
+  
 });
 
 export default GameJelly;
