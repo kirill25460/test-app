@@ -1,16 +1,36 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import OneSignal from 'onesignal-expo-plugin'; 
 import Header from '../components/Header'; 
 import GeoLocation from '../components/GeoLocation';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import '../services/firebaseConfig';
+import { initAppsflyerSDK } from '../services/appsflyer'; 
+import { storeData, getData } from '../utils/storage';
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/Baloo2-VariableFont_wght.ttf'),
   });
+
+  useEffect(() => {
+
+    OneSignal.setNotificationWillShowInForegroundHandler((event) => {
+      let notification = event.getNotification();
+      event.complete(notification);
+    });
+
+
+    (async () => {
+      await storeData('visited', true);
+      const visited = await getData('visited');
+      console.log('Visited status:', visited);
+    })();
+  }, []);
 
   if (!loaded) return null;
 

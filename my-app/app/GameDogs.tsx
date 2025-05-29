@@ -144,6 +144,7 @@ const GameDogs = () => {
   isWin={isWin}
   onBack={() => {
     setIsModalVisible(false);
+    startGame();
   }}
   onNext={() => {
     setIsModalVisible(false);

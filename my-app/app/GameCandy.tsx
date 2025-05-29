@@ -148,6 +148,8 @@ const GameCandy = () => {
   isWin={isWin}
   onBack={() => {
     setIsModalVisible(false);
+    startGame();
+
   }}
   onNext={() => {
     setIsModalVisible(false);

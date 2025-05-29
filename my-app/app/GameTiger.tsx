@@ -144,6 +144,8 @@ const GameTiger = () => {
   isWin={isWin}
   onBack={() => {
     setIsModalVisible(false);
+    startGame();
+
   }}
   onNext={() => {
     setIsModalVisible(false);

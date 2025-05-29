@@ -20,21 +20,13 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ visible, onBack, onNe
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <LinearGradient
-            colors={['#70C0F7', '#9673E3']}
-            style={styles.gradientContainer}
-          >
-            <LinearGradient
-              colors={['#4A0388', '#8B39C2']}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>{isWin ? 'YOU WON!' : 'YOU LOST!'}</Text>
-            </LinearGradient>
-
-          
-          </LinearGradient>
+      {isWin ? (
+        <Image  source={require('../assets/images/cardWin.png')}
+        resizeMode="contain"/>
+      ): (  <Image  source={require('../assets/images/cardLost.png')}
+      resizeMode="contain"/>)}
           <View style={styles.buttons}>
-          <TouchableOpacity onPress={onNext} activeOpacity={0.8}>
+          <TouchableOpacity onPress={onHome} activeOpacity={0.8}>
             <Image
               source={require('../assets/images/home.png')}
               resizeMode="contain"
@@ -48,7 +40,13 @@ const GameResultModal: React.FC<GameResultModalProps> = ({ visible, onBack, onNe
             />
           </TouchableOpacity>
   ) : (
-             <BackButton onPress={onNext}/>
+    <TouchableOpacity 
+    onPress={onBack} activeOpacity={0.8}>
+      <Image
+        source={require('../assets/images/back.png')}
+        resizeMode="contain"
+      />
+    </TouchableOpacity>
   )}
             </View>
         </View>
@@ -94,11 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
   },
-  icon: {
-    width: 32,
-    height: 32,
-    resizeMode: 'contain',
-  },
+
 });
 
 export default GameResultModal;

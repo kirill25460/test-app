@@ -2,7 +2,6 @@ import React from 'react';
 import { Image, ImageBackground, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import Header from '@/components/Header';
 
 const gameCards = [
   { id: 1, image: require('../assets/images/zeus.png'), screen: 'GameZeus' },

@@ -5,14 +5,17 @@ export const useLevelProgress = (startGameCallback) => {
   const navigation = useNavigation();
   const route = useRoute();
 
+  const currentIndex = gameCards.findIndex(card => card.screen === route.name);
+  const currentLevel = currentIndex + 1; 
+  const totalLevels = gameCards.length;
+
   const goToNextLevel = () => {
-    const currentIndex = gameCards.findIndex(card => card.screen === route.name);
     const nextCard = gameCards[currentIndex + 1];
 
     if (nextCard) {
       navigation.navigate(nextCard.screen);
     } else {
-      navigation.navigate('(tabs)'); // Вернуться на главный экран или любое другое
+      navigation.navigate('(tabs)'); 
     }
   };
 
@@ -34,5 +37,8 @@ export const useLevelProgress = (startGameCallback) => {
     handleLevelEnd,
     goToNextLevel,
     restartLevel,
+    currentLevel,
+    totalLevels,
+    levelProgress: `${currentLevel}/${totalLevels}`,
   };
 };

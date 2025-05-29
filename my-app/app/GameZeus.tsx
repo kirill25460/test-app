@@ -139,6 +139,7 @@ const GameZeus = () => {
   isWin={isWin}
   onBack={() => {
     setIsModalVisible(false);
+    startGame();
   }}
   onNext={() => {
     setIsModalVisible(false);
@@ -146,10 +147,7 @@ const GameZeus = () => {
   }}
   onHome={() => {
     setIsModalVisible(false);
-    navigation.reset({
-      index: 0,
-      routes: [{ name: '(tabs)' }], 
-    });
+    navigation.replace('(tabs)');
   }}
   
 />

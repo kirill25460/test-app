@@ -147,6 +147,8 @@ const GameRobots = () => {
   isWin={isWin}
   onBack={() => {
     setIsModalVisible(false);
+    startGame();
+
   }}
   onNext={() => {
     setIsModalVisible(false);

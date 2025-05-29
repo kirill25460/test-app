@@ -142,6 +142,8 @@ const GameSpace = () => {
   isWin={isWin}
   onBack={() => {
     setIsModalVisible(false);
+    startGame();
+
   }}
   onNext={() => {
     setIsModalVisible(false);
