@@ -9,7 +9,16 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.kirill25460.myapp", 
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"] 
+      },
+      "entitlements": {
+        "aps-environment": "development", 
+        "com.apple.security.application-groups": [
+          "group.${ios.bundleIdentifier}.onesignal" 
+        ]
+      }
     },
     "android": {
       "package": "com.kirill25460.myapp",
@@ -38,10 +47,9 @@
       [
         "onesignal-expo-plugin",
         {
-          "appId": "695ef4f5-8485-47ca-ad7c-3258d0d22caa",
           "mode": "development"
         }
-      ]
+      ] 
     ],
     "experiments": {
       "typedRoutes": true

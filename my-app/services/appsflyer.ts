@@ -1,4 +1,3 @@
-// Цей файл підключай лише після eject
 import appsFlyer from 'react-native-appsflyer';
 
 export const initAppsflyerSDK = () => {

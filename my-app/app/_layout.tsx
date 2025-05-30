@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import OneSignal from 'onesignal-expo-plugin'; 
+import appsFlyer from 'react-native-appsflyer';
 import Header from '../components/Header'; 
 import GeoLocation from '../components/GeoLocation';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -18,7 +19,22 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-
+    appsFlyer.initSdk(
+      {
+        devKey: process.env.APPSFLYER_DEV_KEY,
+        isDebug: true,
+        appId: Platform.OS === 'ios' ? process.env.APPSFLYER_IOS_APP_ID : undefined,
+      },
+      (result) => {
+        console.log('AppsFlyer SDK init result:', result);
+      },
+      (error) => {
+        console.error('AppsFlyer SDK init error:', error);
+      }
+    );
+  }, []);
+  
+  useEffect(() => {
     OneSignal.setNotificationWillShowInForegroundHandler((event) => {
       let notification = event.getNotification();
       event.complete(notification);
