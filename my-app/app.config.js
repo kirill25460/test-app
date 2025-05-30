@@ -36,6 +36,12 @@ export default {
       favicon: "./assets/images/favicon.png"
     },
     plugins: [
+        [
+            "onesignal-expo-plugin",
+            {
+              mode: "development"
+            }
+          ],
       "expo-router",
       [
         "expo-splash-screen",
@@ -44,12 +50,6 @@ export default {
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff"
-        }
-      ],
-      [
-        "onesignal-expo-plugin",
-        {
-          mode: "development"
         }
       ],
       [
