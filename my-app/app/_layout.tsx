@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-import OneSignal from 'onesignal-expo-plugin'; 
+import {OneSignal} from 'react-native-onesignal'; 
 import appsFlyer from 'react-native-appsflyer';
 import Header from '../components/Header'; 
 import GeoLocation from '../components/GeoLocation';
